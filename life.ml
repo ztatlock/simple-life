@@ -34,18 +34,15 @@ let neighbors (r, c) =
 (* given a universe, row i, col j, and cell @ (i, j)
  * determine the next state of that cell *)
 let step_cell u i j cell =
-  let islive = cell <> 0 in
   let ns =
     (i, j) |> neighbors
            |> List.map (fun (r, c) -> u.(r).(c))
            |> List.fold_left (+) 0
   in
-  if islive && 1 < ns && ns < 4 then
-    live
-  else if not islive && ns = 3 then
-    live
+  if cell = live then
+    if 1 < ns && ns < 4 then live else dead
   else
-    dead
+    if ns = 3 then live else dead
 
 let step_row u i r =
   Array.mapi (step_cell u i) r
