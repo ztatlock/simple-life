@@ -1,1 +1,4 @@
 Running example for PL lectures introducing ML.
+
+Implements Conway's Game of Life, the original cellular automaton:
+  http://en.wikipedia.org/wiki/Conway's_Game_of_Life
