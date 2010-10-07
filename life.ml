@@ -1,117 +1,124 @@
-let h = 45
-let w = 75
+(* UCSD CSE 130 : Programming Languages
+ *
+ * OCaml demo using Conway's Game of Life
+ *
+ * ztatlock@cs.ucsd.edu
+ *)
 
+(* pipe function as infix operator *)
 let (|>) x f = f x
 
-let range n =
-  let rec loop n =
-    if n < 0 then
-      []
-    else
-      n :: (loop (n - 1))
-  in
-  loop (n - 1)
+(* dimensions of the universe *)
+let uH = 30
+let uW = 70
 
+(* cell states *)
+let dead = 0
+let live = 1
 
-let mkboard () =
-  Array.init h (fun _ ->
-    Array.init w (fun _ ->
-      0))
+(* universe represented as 2d int matrix *)
+let mk_univ () =
+  Array.make_matrix uH uW dead
 
-let get board (r, c) =
-  Array.get (Array.get board r) c
-
-let set board (r, c) s =
-  Array.set (Array.get board r) c s
-
-let print board =
-  List.iter
-    (fun r ->
-       List.iter
-         (fun c ->
-           if get board (r, c) = 0 then
-             print_string " "
-           else
-             print_string "o")
-         (range w);
-       print_string "\n")
-    (range h)
-
+(* addresses of neighbors for cell @ (r, c) *)
 let neighbors (r, c) =
-  let up = (r + h - 1) mod h in
-  let dn = (r +     1) mod h in
-  let lt = (c + w - 1) mod w in
-  let rt = (c +     1) mod w in
-  [ (up, lt); (up, c); (up, rt)
-  ; (r,  lt);          (r,  rt)
-  ; (dn, lt); (dn, c); (dn, rt)
+  let up  = (r + uH - 1) mod uH in
+  let dn  = (r + uH + 1) mod uH in
+  let lft = (c + uW - 1) mod uW in
+  let rht = (c + uW + 1) mod uW in
+  [ (up, lft); (up, c); (up, rht)
+  ; (r,  lft);          (r,  rht)
+  ; (dn, lft); (dn, c); (dn, rht)
   ]
 
-let live_neighbors board coords =
-  coords
-    |> neighbors
-    |> List.map (get board) 
-    |> List.fold_left (+) 0
-
-let step board =
-  let nb = mkboard () in
-  List.iter
-    (fun r ->
-      List.iter
-        (fun c ->
-          let ln = live_neighbors board (r, c) in
-          if 2 < ln && ln < 5 then
-            set nb (r, c) 1
-          else
-            set nb (r, c) 0)
-        (range w))
-    (range h);
-  nb
-
-let sleep () =
-  let rec loop n =
-    if n <= 0 then
-      ()
-    else begin
-      loop (n - 1);
-      loop (n - 1)
-    end
+(* given a universe, row i, col j, and cell @ (i, j)
+ * determine the next state of that cell *)
+let step_cell u i j cell =
+  let islive = cell <> 0 in
+  let ns =
+    (i, j) |> neighbors
+           |> List.map (fun (r, c) -> u.(r).(c))
+           |> List.fold_left (+) 0
   in
-  loop 22
-  
+  if islive && 1 < ns && ns < 4 then
+    live
+  else if not islive && ns = 3 then
+    live
+  else
+    dead
+
+let step_row u i r =
+  Array.mapi (step_cell u i) r
+
+(* get the next universe *)
+let step u =
+  Array.mapi (step_row u) u
 
 let clear () =
-  List.iter
-    (fun _ -> print_endline "")
-    (range 80)
+  print_string
+    ( "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    ^ "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    ^ "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    )
 
-let rec loop b =
-  let b' = step b in
+let row_str r =
+  let aux acc cell =
+    match cell with
+    | 0 -> acc ^ "."
+    | _ -> acc ^ "o"
+  in
+  Array.fold_left aux "" r
+
+let univ_str u =
+  let aux acc r =
+    acc ^ (row_str r) ^ "\n"
+  in
+  Array.fold_left aux "" u
+
+let nap () =
+  let rec loop i =
+    if i > 1000000 then
+      ()
+    else
+      loop (i + 1)
+  in
+  loop 0
+
+(* briefly show the user this universe *)
+let display u =
   clear ();
-  print b;
+  print_string (univ_str u);
   flush stdout;
-  sleep ();
-  loop b'
+  nap ();
+  u
 
+let rec main u =
+  u |> display
+    |> step
+    |> main
 
-let b = mkboard ()
+(* famous life patterns *)
+
+let glider r c u =
+  u.(r + 0).(c + 1) <- live;
+  u.(r + 1).(c + 2) <- live;
+  u.(r + 2).(c + 0) <- live;
+  u.(r + 2).(c + 1) <- live;
+  u.(r + 2).(c + 2) <- live;
+  u
+
+let acorn r c u =
+  u.(r + 0).(c + 1) <- live;
+  u.(r + 1).(c + 3) <- live;
+  u.(r + 2).(c + 0) <- live;
+  u.(r + 2).(c + 1) <- live;
+  u.(r + 2).(c + 4) <- live;
+  u.(r + 2).(c + 5) <- live;
+  u.(r + 2).(c + 6) <- live;
+  u
 
 let _ =
-  List.iter
-    (fun (r, c) -> set b (r, c) 1)
-    [ (1, 1)
-    ; (1, 3)
-    ; (2, 2)
-    ; (2, 3)
-    ; (3, 2)
-    ; (3, 3)
-    ; (3, 1)
-    ; (5, 6)
-    ; (5, 5)
-    ; (5, 7)
-    ; (5, 8)
-    ; (6, 5)
-    ]
-
-let _ = loop b
+  () |> mk_univ
+     |> acorn 15 35
+     |> main
 
