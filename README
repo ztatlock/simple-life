@@ -1,3 +1,6 @@
+UCSD CSE 130 : Programming Languages
+ztatlock@cs.ucsd.edu
+
 Running example for PL lectures introducing ML.
 
 Implements Conway's Game of Life, the original cellular automaton:
