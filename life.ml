@@ -1,7 +1,5 @@
-(* UCSD CSE 130 : Programming Languages
- *
- * OCaml demo using Conway's Game of Life
- *
+(* Conway's Game of Life in OCaml
+ * Running Example for UCSD CSE 130 : PL
  * ztatlock@cs.ucsd.edu
  *)
 
@@ -73,13 +71,7 @@ let univ_str u =
   Array.fold_left aux "" u
 
 let nap () =
-  let rec loop i =
-    if i > 1000000 then
-      ()
-    else
-      loop (i + 1)
-  in
-  loop 0
+  Unix.select [] [] [] 0.2
 
 (* briefly show the user this universe *)
 let display u =

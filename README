@@ -6,9 +6,11 @@ Implements Conway's Game of Life, the original cellular automaton:
 
 To run:
 
-  $ ocaml life.ml
+  $ ./life
 
 The implementation is based on arrays, but they're used in a mostly
 functional style; the world is updated by mapping the step function over
 the universe to get the next universe.
+
+Potential portability issue: we use Unix.select to get sub-second sleeps.
 

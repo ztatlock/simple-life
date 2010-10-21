@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+ocaml unix.cma life.ml
+
