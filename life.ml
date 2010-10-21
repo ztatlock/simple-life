@@ -8,7 +8,7 @@ let (|>) x f = f x
 
 (* dimensions of the universe *)
 let uH = 30
-let uW = 70
+let uW = 60
 
 (* cell states *)
 let dead = 0
@@ -108,6 +108,6 @@ let acorn r c u =
 
 let _ =
   () |> mk_univ
-     |> acorn 15 35
+     |> acorn (uH / 2) (uW / 2)
      |> main
 
