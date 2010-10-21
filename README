@@ -1,7 +1,14 @@
-UCSD CSE 130 : Programming Languages
-ztatlock@cs.ucsd.edu
 
-Running example for PL lectures introducing ML.
+Simple Game of Life in OCaml
 
 Implements Conway's Game of Life, the original cellular automaton:
   http://en.wikipedia.org/wiki/Conway's_Game_of_Life
+
+To run:
+
+  $ ocaml life.ml
+
+The implementation is based on arrays, but they're used in a mostly
+functional style; the world is updated by mapping the step function over
+the universe to get the next universe.
+
